@@ -1,14 +1,22 @@
 FROM python:3.10-slim
-RUN apt update && apt upgrade -y
-RUN apt-get install git curl python3-pip ffmpeg -y
-RUN apt-get -y install git
-RUN apt-get install -y wget python3-pip curl bash neofetch ffmpeg software-properties-common
-WORKDIR /app
-COPY requirements.txt .
 
+# Install dependencies
+RUN apt update && apt upgrade -y
+RUN apt-get install -y git curl python3-pip ffmpeg wget bash neofetch software-properties-common
+
+# Set working directory
+WORKDIR /app
+
+# Copy and install Python dependencies
+COPY requirements.txt .
 RUN pip3 install wheel
 RUN pip3 install --no-cache-dir -U -r requirements.txt
+
+# Copy all project files
 COPY . .
+
+# Expose port for Flask
 EXPOSE 5000
 
-CMD flask run -h 0.0.0.0 -p 5000 & python3 main.py
+# Start both Flask and main.py properly
+CMD ["sh", "-c", "flask run --host=0.0.0.0 --port=5000 & python3 main.py"]
